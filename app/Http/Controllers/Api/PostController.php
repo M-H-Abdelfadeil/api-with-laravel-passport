@@ -30,15 +30,6 @@ class PostController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return ResponseHelper
-     */
-    public function create(PostRequest $request)
-    {
-        return $request;
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -113,7 +104,43 @@ class PostController extends Controller
 
         $post->delete();
 
-        return ResponseHelper::sendResponseSuccess([],200,MessagesHelper::DELETED_SUCCESSFULLY);
+        return ResponseHelper::sendResponseSuccess([],Response::HTTP_OK,MessagesHelper::DELETED_SUCCESSFULLY);
+    }
+
+    public function trashed(){
+        $posts = Post::onlyTrashed()
+                    ->whereUserId(auth('api')->id())
+                    ->select('id', 'title', 'description', 'created_at')
+                    ->paginate(5);
+
+        return ResponseHelper::sendResponseSuccess($posts);
+    }
+
+    public function force_delete($id)
+    {
+        $post = Post::onlyTrashed()->whereId($id)->first();
+
+        if($this->ifNotUserPost($post)){
+            return $this->ifNotUserPost($post);
+        }
+
+        $post->forceDelete();
+
+        return ResponseHelper::sendResponseSuccess([],Response::HTTP_OK,MessagesHelper::DELETED_SUCCESSFULLY);
+    }
+
+
+    public function restore($id)
+    {
+        $post = Post::withTrashed()->whereId($id)->first();
+
+        if($this->ifNotUserPost($post)){
+            return $this->ifNotUserPost($post);
+        }
+
+        $post->restore();
+
+        return ResponseHelper::sendResponseSuccess([],Response::HTTP_OK,MessagesHelper::RESTORE_SUCCESSFULLY);
     }
 
     /**
@@ -132,4 +159,6 @@ class PostController extends Controller
         return false;
 
     }
+
+
 }

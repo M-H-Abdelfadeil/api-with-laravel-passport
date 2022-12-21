@@ -27,6 +27,9 @@ Route::group(['prefix' => 'v1'], function () {
 
 
     Route::group(['middleware' => 'auth.api'], function () {
+        Route::get('posts/trashed', [PostController::class, 'trashed']);
+        Route::post('posts/restore/{post}', [PostController::class, 'restore']);
+        Route::delete('posts/force-delete/{post}', [PostController::class, 'force_delete']);
         Route::apiResource('posts', PostController::class);
     });
 
