@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Helpers;
 
+use Illuminate\Http\Response;
+
 class ResponseHelper{
     /**
      * send response success
@@ -9,25 +11,38 @@ class ResponseHelper{
      * @param int $code
      * @return \Illuminate\Http\JsonResponse
      */
-    public static function sendResponseSuccess(array $data , string $message , int $code=200 ){
-        $response = [
-            'status' => true,
-            'data'    => $data,
-            'message' => $message,
-        ];
+    public static function sendResponseSuccess($data=[] , int  $code = 200  , $message=null ){
+        $response = self::responseData( true , $code  , $data , $message);
+        return response()->json($response, Response::HTTP_OK);
+    }
 
+    /**
+     *  Send response error
+     * @param array $data
+     * @param mixed $message
+     * @param mixed $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function sendResponseError( $data , int  $code  , $message=null ){
 
+        $response = self::responseData( false , $code  , $data , $message);
         return response()->json($response, $code);
     }
 
-    public static function sendResponseError(array $data , $message , $code=404 ){
-        $response = [
-            'status' => false,
+
+
+
+    private static function responseData(bool $status , int $status_code , $data , $message){
+
+        $message = $message ? $message : Response::$statusTexts[$status_code];
+
+        return  [
+            'status' =>  $status,
+            'status_code'=>$status_code,
             'data'    => $data,
-            'message' => $message,
+            'message' =>  $message,
         ];
-
-
-        return response()->json($response, $code);
     }
+
+
 }

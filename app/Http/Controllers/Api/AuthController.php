@@ -9,6 +9,7 @@ use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
@@ -24,7 +25,8 @@ class AuthController extends Controller
             "user"=>$user,
             "token"=>$token
         ];
-       return  ResponseHelper::sendResponseSuccess($data , MessagesHelper::CREATED_SUCCESSFULLY,  201 );
+        return ResponseHelper::sendResponseSuccess($data, Response::HTTP_CREATED);
+
 
     }
 
@@ -32,12 +34,13 @@ class AuthController extends Controller
         if(auth()->attempt(['email'=>$request->email , 'password'=>$request->password])){
             $user = auth()->user();
             $token = $user->createToken('api')->accessToken;
-            return ResponseHelper::sendResponseSuccess([
+            $data = [
                 "user"=>$user,
                 "token"=>$token
-            ],MessagesHelper::LOGGED_IN_SUCCESSFULLY);
+            ];
+            return ResponseHelper::sendResponseSuccess($data, Response::HTTP_OK, MessagesHelper::LOGGED_IN_SUCCESSFULLY);
         }else{
-            return ResponseHelper::sendResponseError([],MessagesHelper::UNAUTHORIZED,401);
+            return ResponseHelper::sendResponseError([], Response::HTTP_UNAUTHORIZED);
         }
     }
 }
