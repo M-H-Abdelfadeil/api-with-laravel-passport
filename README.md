@@ -1,4 +1,4 @@
-<p align="center"><img src="data-readme/logo.png" alt="Logo"></p>
+<p align="center"><img src="data-readme/logo.jpeg" alt="Logo"></p>
 
 
 ## Album Task Require 
